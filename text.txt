@@ -1,0 +1,13 @@
+return Stack(
+  children: [SizedBox(
+        width: screen.width,
+        height: screen.height * 2/3,
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width:_controller!.value.previewSize!.height,
+            height: _controller!.value.previewSize!.width,
+            child: CameraPreview(_controller!),
+          ),
+        ),
+      ),]);
