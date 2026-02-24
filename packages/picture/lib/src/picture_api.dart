@@ -7,39 +7,44 @@ class PictureApi {
     : pictureDatasource = pictureDatasource ?? PictureDatasource();
   PictureDatasource? pictureDatasource;
 
-  Future<PictureDatasource> openCamera() async {
+  Future<PictureDatasource> openCamera(bool backCamera) async {
     try {
       if (pictureDatasource?.controller != null &&
           pictureDatasource!.controller!.value.isInitialized) {
-        pictureDatasource!.controller == null;
+        await pictureDatasource!.controller!.dispose();
       }
-      final cameras = await availableCameras();
-      final CameraDescription backCamera = cameras.firstWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.back,
+      final List<CameraDescription> cameras = await availableCameras();
+
+      CameraLensDirection directionToFind = backCamera
+          ? CameraLensDirection.back
+          : CameraLensDirection.front;
+
+      final selectedCamera = cameras.firstWhere(
+        (c) => c.lensDirection == directionToFind,
         orElse: () => cameras.first,
       );
-      final CameraController? controller = CameraController(
-        backCamera,
+      final CameraController controller = CameraController(
+        selectedCamera,
         ResolutionPreset.ultraHigh,
         enableAudio: false,
         imageFormatGroup: ImageFormatGroup.jpeg,
-      );
-      if (controller == null) {
-        return pictureDatasource!.copyWith(errorMessage: 'No camera available');
-      }
+      )..setFlashMode(FlashMode.off);
+
       await controller.initialize();
       pictureDatasource = pictureDatasource!.copyWith(
         controller: controller,
         errorMessage: null,
+        cameraLensDirection: backCamera,
       );
 
       return pictureDatasource!;
     } on CameraException catch (e) {
-      return pictureDatasource!.copyWith(
-        errorMessage: 'No camera available - ${e.description}',
+      pictureDatasource = pictureDatasource!.copyWith(
+        errorMessage: 'No camera available - ${e.toString()}',
       );
+      return pictureDatasource!;
     } catch (e) {
-      return pictureDatasource!.copyWith(
+      return pictureDatasource = pictureDatasource!.copyWith(
         errorMessage: 'No camera available - ${e.toString()}',
       );
     }

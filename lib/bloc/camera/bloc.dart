@@ -14,6 +14,7 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
     on<PictureTaken>(_onTaken);
     on<PickPictureFromGallery>(_onPickFromGallery, transformer: droppable());
     on<PictureUpload>(_onPictureUpload, transformer: droppable());
+    on<ChangeFlash>(_toggleFlash, transformer: droppable());
   }
 
   Future<void> _loadKeys(LoadKeys event, Emitter emit) async {
@@ -29,17 +30,20 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
     }
   }
 
-  // ////////////// //
+  // 🖼️🖼️🖼️🖼️
   Future<void> _onInit(PictureInit event, Emitter emit) async {
     try {
       if (state.controller != null && !state.controller!.value.isInitialized) {
         state.controller == null;
       }
-      final RepositoryDatasource controller = await repository.openCamera();
-      if (controller.pictureDatasource!.controller == null) {
+      final RepositoryDatasource controller = await repository.openCamera(
+        backCamera: event.backCamera,
+      );
+      if (controller.pictureDatasource!.errorMessage != null) {
         emit(
           state.copyWith(
             status: PictureStatus.error,
+            controller: null,
             errorMessage:
                 controller.pictureDatasource?.errorMessage ??
                 'Camera is not available',
@@ -51,10 +55,17 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
         state.copyWith(
           status: PictureStatus.init,
           controller: controller.pictureDatasource!.controller,
+          backCamera: controller.pictureDatasource!.cameraLensDirection
         ),
       );
     } catch (e) {
-      emit(state.copyWith(status: PictureStatus.error, errorMessage: '$e'));
+      emit(
+        state.copyWith(
+          status: PictureStatus.error,
+          errorMessage: '$e',
+          controller: null,
+        ),
+      );
     }
   }
 
@@ -102,6 +113,9 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
   ) async {
     try {
       final RepositoryDatasource image = await repository.openGallery();
+
+      if (image.pictureDatasource!.image == null) return;
+
       if (image.pictureDatasource!.errorMessage != null) {
         emit(
           state.copyWith(
@@ -110,7 +124,7 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
           ),
         );
       }
-      if (image.pictureDatasource!.image == null) return;
+
       emit(
         state.copyWith(
           status: PictureStatus.loading,
@@ -133,7 +147,28 @@ class PictureBloc extends Bloc<PictureEvent, PictureState> {
     }
   }
 
-  // ////////////// //
+  Future<void> _toggleFlash(ChangeFlash event, Emitter emit) async {
+    if (!state.controller!.value.isInitialized) return;
+    
+
+    try {
+      if (!state.backCamera!)  return;
+    
+  final newMode = state.controller!.value.flashMode == FlashMode.off
+      ? FlashMode.always
+      : FlashMode.off;
+  
+  await state.controller!.setFlashMode(newMode);
+  emit(
+    state.copyWith(status: PictureStatus.init, controller: state.controller),
+  );
+}  catch (e) {
+
+
+}
+  }
+
+  // UPLOAD 🆙🆙🆙🆙🆙🆙
   Future<void> _onPictureUpload(PictureUpload event, Emitter emit) async {
     try {
       emit(state.copyWith(status: PictureStatus.uploading));

@@ -29,6 +29,7 @@ dependencies:
   internet_conn_ckecking:
     path: ../internet_conn_ckecking
   worker_manager: ^7.2.7
+  equatable: ^2.0.8
 
 dev_dependencies:
   flutter_test:

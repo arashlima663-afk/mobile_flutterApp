@@ -1,9 +1,11 @@
 import 'dart:io';
-import 'package:camera/camera.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/GetIt/dependency_injection.dart';
+import 'package:flutter_application_1/pages/camera_preview.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../bloc/barrel.dart';
 
 class UsersPage extends StatelessWidget {
@@ -33,7 +35,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 1));
     context.read<PictureBloc>().add(LoadKeys());
   }
 
@@ -56,7 +57,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   ElevatedButton(
                     onPressed: () =>
-                        context.read<PictureBloc>().add(PictureInit()),
+                        context.read<PictureBloc>().add(PictureInit(true)),
                     child: const Text('Camera'),
                   ),
                   const SizedBox(width: 12),
@@ -120,33 +121,14 @@ class _HomePageState extends State<HomePage> {
                   switch (state.status) {
                     case PictureStatus.init:
                       if (state.controller == null) {
-                        return const Text('Camera not ready');
+                        return Center(
+                          child: Text(state.errorMessage ?? 'Error'),
+                        );
                       }
-                      // final size = MediaQuery.of(context).size;
-                      // final width = size.width;
-                      // final height = size.height;
-
-                      return Transform.scale(
-                        alignment: Alignment.topCenter,
-                        scaleY: 0.90,
-                        child: Stack(
-                          children: [
-                            CameraPreview(state.controller!),
-                            Positioned(
-                              bottom: 14,
-                              left: 0,
-                              right: 0,
-                              child: Center(
-                                child: ElevatedButton(
-                                  onPressed: () => context
-                                      .read<PictureBloc>()
-                                      .add(PictureTaken()),
-                                  child: const Icon(Icons.camera_alt, size: 32),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                      final size = MediaQuery.of(context).size;
+                      return CameraView(
+                        controller: state.controller!,
+                        size: size,
                       );
 
                     case PictureStatus.taken:

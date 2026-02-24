@@ -5,7 +5,6 @@ import 'package:worker_manager/worker_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await setup();
   await workerManager.init();
   runApp(MaterialApp(home: UsersPage()));

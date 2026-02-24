@@ -16,14 +16,17 @@ class PictureState {
   final String? errorMessage;
   final CameraController? controller;
   final XFile? image;
+  final bool? backCamera;
   final dynamic response;
+
 
   PictureState({
     required this.status,
     this.errorMessage,
     this.controller,
     this.image,
-    this.response,
+    this.response, 
+    this.backCamera,
   });
 
   factory PictureState.initial() => PictureState(status: PictureStatus.empty);
@@ -34,6 +37,8 @@ class PictureState {
     CameraController? controller,
     XFile? image,
     dynamic response,
+    bool? backCamera
+
   }) {
     return PictureState(
       status: status ?? this.status,
@@ -41,6 +46,7 @@ class PictureState {
       controller: controller ?? this.controller,
       image: image ?? this.image,
       response: response ?? this.response,
+      backCamera: backCamera ?? this.backCamera
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:cryptography/cryptography.dart';
+import 'package:equatable/equatable.dart';
 
-base class KeyModel {
+base class KeyModel extends Equatable {
   final String? ownerId;
   final SecretKey? aesSecretKey;
   final List<int>? aesNonce;
@@ -17,4 +18,7 @@ base class KeyModel {
       'error': error,
     };
   }
+
+  @override
+  List<Object?> get props => [ownerId, aesNonce, aesSecretKey, error];
 }

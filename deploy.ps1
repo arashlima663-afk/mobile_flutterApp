@@ -2,7 +2,7 @@
 
 # CONFIG
 $BASE_HREF = "/web_flutterApp/"
-$GITHUB_REPO = "https://github.com/9lima/web_flutterApp.git"
+$GITHUB_REPO = "https://github.com/arashlima663-afk/web_flutterApp.git"
 $BRANCH = "gh-pages"
 
 # Step 1: Clean project

@@ -12,7 +12,7 @@ dependencies:
   equatable: ^2.0.8
   flutter:
     sdk: flutter
-  json_annotation: ^4.6.0
+  json_annotation: ^4.11.0
   key_api:
     path: ../key_api
   mocktail: ^1.0.4

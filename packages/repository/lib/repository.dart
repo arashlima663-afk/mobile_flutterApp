@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:isolate';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:internet_conn_ckecking/Internet_conn_checking.dart';
@@ -106,9 +107,24 @@ base class Repository {
   }
 
   // Picture Functions 🖼️🖼️🖼️🖼️
-  Future<RepositoryDatasource> openCamera() async {
-    final PictureDatasource pictureDatasource = await pictureApi.openCamera();
-    return repositoryDatasource.copyWith(pictureDatasource: pictureDatasource);
+  Future<RepositoryDatasource> openCamera({required bool backCamera}) async {
+    if (repositoryDatasource.pictureDatasource?.controller != null &&
+        repositoryDatasource
+            .pictureDatasource!
+            .controller!
+            .value
+            .isInitialized) {
+      await repositoryDatasource.pictureDatasource!.controller!.dispose();
+    }
+
+    final PictureDatasource pictureDatasource = await pictureApi.openCamera(
+      backCamera,
+    );
+    repositoryDatasource = repositoryDatasource.copyWith(
+      pictureDatasource: pictureDatasource,
+    );
+
+    return repositoryDatasource;
   }
 
   Future<RepositoryDatasource> takePicture() async {
